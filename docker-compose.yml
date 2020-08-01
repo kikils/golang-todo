@@ -1,0 +1,26 @@
+version: '3'
+services:
+  app:
+    build: 
+        context: ./app
+    container_name: golang_todo_app
+    tty: true
+    volumes:
+      - ./app:/go/src/github.com/kikils/golang-todo
+    stdin_open: true
+    ports:
+        - 8080:8080
+    depends_on:
+        - postgres
+
+  postgres:
+    image: postgres:10
+    container_name: golang_todo_db
+    ports:
+        - 5432:5432
+    volumes:
+        - ./db/init/:/docker-entrypoint-initdb.d/:ro
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=postgres
