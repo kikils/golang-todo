@@ -1,10 +1,10 @@
 package infrastructure
 
 import (
-	"log"
-	"github.com/kikils/golang-todo/interfaces"
 	"database/sql"
+	"fmt"
 
+	"github.com/kikils/golang-todo/interfaces/database"
 	_ "github.com/lib/pq" // postres driver
 )
 
@@ -12,46 +12,66 @@ type Sqlhandler struct {
 	DB *sql.DB
 }
 
-func ConnectPostgres() (*Sqlhandler, error) {
+func NewSqlhandler() *Sqlhandler {
 	connStr := "postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, err
+		return nil
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return nil, err
+		fmt.Println("here")
+		return nil
 	}
 
-	return &Sqlhandler{db}, nil
+	return &Sqlhandler{db}
 }
 
-func (handler *Sqlhandler) Execute(statement string, args ...interface{}) error {
-	_, err := handler.DB.Exec(statement, args...)
-	return err
-}
-
-func (handler *Sqlhandler) Query(statement string) interfaces.Row {
-	//fmt.Println(statement)
-	rows, err := handler.DB.Query(statement)
+func (handler *Sqlhandler) Execute(statement string, args ...interface{}) (database.Result, error) {
+	res := SqlResult{}
+	result, err := handler.DB.Exec(statement, args...)
 	if err != nil {
-		log.Fatal(err)
-		return new(SqlRow)
+		return res, err
+	}
+	res.Result = result
+	return res, nil
+}
+
+func (handler *Sqlhandler) Query(statement string, args ...interface{}) (database.Row, error) {
+	rows, err := handler.DB.Query(statement, args...)
+	if err != nil {
+		return new(SqlRow), err
 	}
 	row := new(SqlRow)
 	row.Rows = rows
-	return row
+	return row, nil
+}
+
+type SqlResult struct {
+	Result sql.Result
+}
+
+func (r SqlResult) LastInsertId() (int64, error) {
+	return r.Result.LastInsertId()
+}
+
+func (r SqlResult) RowsAffected() (int64, error) {
+	return r.Result.RowsAffected()
 }
 
 type SqlRow struct {
 	Rows *sql.Rows
 }
 
-func (r SqlRow) Scan(dest ...interface{}) {
-	r.Rows.Scan(dest...)
+func (r SqlRow) Scan(dest ...interface{}) error {
+	return r.Rows.Scan(dest...)
 }
 
 func (r SqlRow) Next() bool {
 	return r.Rows.Next()
+}
+
+func (r SqlRow) Close() error {
+	return r.Rows.Close()
 }

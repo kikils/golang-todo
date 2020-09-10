@@ -5,16 +5,9 @@ import (
 	"testing"
 )
 
-func Test_ConnectPostgres(t *testing.T) {
-	_, err := ConnectPostgres()
-	if err != nil {
-		t.Fatal("DB connection error has occured.")
-	}
-}
-
 func Test_Sqlhandler(t *testing.T) {
 	type args struct {
-		id int
+		id   int
 		name string
 	}
 	tests := []struct {
@@ -28,11 +21,8 @@ func Test_Sqlhandler(t *testing.T) {
 			want: args{id: 0, name: "test"},
 		},
 	}
-	handler, err := ConnectPostgres()
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = handler.Execute("DROP TABLE IF EXISTS foo;")
+	handler := NewSqlhandler()
+	_, err := handler.Execute("DROP TABLE IF EXISTS foo;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,12 +30,15 @@ func Test_Sqlhandler(t *testing.T) {
 	insertQuery := "INSERT INTO foo (id, name) VALUES ($1, $2);"
 
 	for _, tt := range tests {
-		err = handler.Execute(insertQuery, tt.args.id, tt.args.name)
+		_, err = handler.Execute(insertQuery, tt.args.id, tt.args.name)
 		if err != nil {
 			t.Fatal(err)
 		}
 		var got args
-		row := handler.Query("SELECT * FROM foo LIMIT 1;")
+		row, err := handler.Query("SELECT * FROM foo LIMIT 1;")
+		if err != nil {
+			t.Fatal(err)
+		}
 		row.Next()
 		row.Scan(&got.id, &got.name)
 		t.Run(tt.name, func(t *testing.T) {

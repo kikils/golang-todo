@@ -1,9 +1,7 @@
 package main
 
-import (
-	"github.com/kikils/golang-todo/other"
-)
+import "github.com/kikils/golang-todo/infrastructure"
 
 func main() {
-	other.SayHello()
+	infrastructure.Router.Run()
 }
