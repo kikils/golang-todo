@@ -28,7 +28,7 @@ func NewTodoController(handler database.Sqlhandler) *TodoController {
 func (controller *TodoController) Create(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		responseError(w, http.StatusInternalServerError, err.Error())
+		ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -39,7 +39,7 @@ func (controller *TodoController) Create(w http.ResponseWriter, r *http.Request)
 		UserID  int    `json:"user_id"`
 	}
 	if err := json.Unmarshal(b, &todoReceptor); err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	formattedTime, _ := time.Parse("20060102", todoReceptor.DueDate)
@@ -51,25 +51,25 @@ func (controller *TodoController) Create(w http.ResponseWriter, r *http.Request)
 	}
 	id, err := controller.Interactor.Add(todo)
 	if err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	responseOk(w, id)
+	ResponseOk(w, id)
 }
 
 func (controller *TodoController) Index(w http.ResponseWriter, r *http.Request) {
 	todoList, err := controller.Interactor.Todos()
 	if err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	responseOk(w, todoList)
+	ResponseOk(w, todoList)
 }
 
 func (controller *TodoController) Show(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		responseError(w, http.StatusInternalServerError, err.Error())
+		ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -77,22 +77,22 @@ func (controller *TodoController) Show(w http.ResponseWriter, r *http.Request) {
 		ID int `json:"id"`
 	}
 	if err := json.Unmarshal(b, &req); err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	todo, err := controller.Interactor.TodoById(req.ID)
 	if err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	responseOk(w, todo)
+	ResponseOk(w, todo)
 }
 
 func (controller *TodoController) Search(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		responseError(w, http.StatusInternalServerError, err.Error())
+		ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -100,26 +100,26 @@ func (controller *TodoController) Search(w http.ResponseWriter, r *http.Request)
 		UserID int `json:"user_id"`
 	}
 	if err := json.Unmarshal(b, &req); err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	todoList, err := controller.Interactor.TodoByUserId(req.UserID)
 	if err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	responseOk(w, todoList)
+	ResponseOk(w, todoList)
 }
 
-func responseOk(w http.ResponseWriter, body interface{}) {
+func ResponseOk(w http.ResponseWriter, body interface{}) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
 	json.NewEncoder(w).Encode(body)
 }
 
-func responseError(w http.ResponseWriter, code int, message string) {
+func ResponseError(w http.ResponseWriter, code int, message string) {
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")
 

@@ -27,37 +27,37 @@ func NewUserController(sqlHandler database.Sqlhandler) *UserController {
 func (controller *UserController) Create(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		responseError(w, http.StatusInternalServerError, err.Error())
+		ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	var user model.User
 	if err := json.Unmarshal(b, &user); err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	id, err := controller.Interactor.Add(user)
 	if err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	responseOk(w, id)
+	ResponseOk(w, id)
 }
 
 func (controller *UserController) Index(w http.ResponseWriter, r *http.Request) {
 	users, err := controller.Interactor.Users()
 	if err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	responseOk(w, users)
+	ResponseOk(w, users)
 }
 
 func (controller *UserController) Show(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		responseError(w, http.StatusInternalServerError, err.Error())
+		ResponseError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -65,14 +65,14 @@ func (controller *UserController) Show(w http.ResponseWriter, r *http.Request) {
 		ID int `json:"id"`
 	}
 	if err := json.Unmarshal(b, &req); err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	user, err := controller.Interactor.UserById(req.ID)
 	if err != nil {
-		responseError(w, http.StatusBadRequest, err.Error())
+		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	responseOk(w, user)
+	ResponseOk(w, user)
 }
