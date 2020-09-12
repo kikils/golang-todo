@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/kikils/golang-todo/domain/model"
-	"github.com/kikils/golang-todo/interfaces/database"
-	"github.com/kikils/golang-todo/usecase"
+	"github.com/kikils/golang-todo/app/domain/model"
+	"github.com/kikils/golang-todo/app/interfaces/database"
+	"github.com/kikils/golang-todo/app/usecase"
 )
 
 type UserController struct {

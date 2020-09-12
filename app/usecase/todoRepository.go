@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/kikils/golang-todo/domain/model"
+	"github.com/kikils/golang-todo/app/domain/model"
 )
 
 type TodoRepository interface {

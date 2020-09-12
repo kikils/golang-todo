@@ -1,4 +1,4 @@
-module github.com/kikils/golang-todo
+module github.com/kikils/golang-todo/app
 
 go 1.14
 

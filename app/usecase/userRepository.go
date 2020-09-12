@@ -1,6 +1,6 @@
 package usecase
 
-import "github.com/kikils/golang-todo/domain/model"
+import "github.com/kikils/golang-todo/app/domain/model"
 
 type UserRepository interface {
 	Store(model.User) (int, error)

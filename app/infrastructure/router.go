@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/kikils/golang-todo/interfaces/controllers"
+	"github.com/kikils/golang-todo/app/interfaces/controllers"
 )
 
 func SetUpRouting() *http.ServeMux {

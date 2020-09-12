@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/kikils/golang-todo/infrastructure"
+	"github.com/kikils/golang-todo/app/infrastructure"
 )
 
 func main() {
