@@ -1,8 +1,6 @@
 package database
 
 import (
-	"log"
-
 	"github.com/kikils/golang-todo/domain/model"
 )
 
@@ -16,7 +14,6 @@ func (repo *UserRepository) Store(u model.User) (id int, err error) {
 	)
 
 	if err != nil {
-		log.Println(err)
 		return
 	}
 	for row.Next() {
@@ -29,41 +26,25 @@ func (repo *UserRepository) Store(u model.User) (id int, err error) {
 
 func (repo *UserRepository) FindById(identifier int) (user model.User, err error) {
 	row, err := repo.Sqlhandler.Query("SELECT id, FirstName, LastName FROM users WHERE id = $1;", identifier)
-	defer row.Close()
 	if err != nil {
-		log.Println(err)
 		return
 	}
-	var id int
-	var firstName string
-	var lastName string
 	row.Next()
-	if err = row.Scan(&id, &firstName, &lastName); err != nil {
+	if err = row.Scan(&(user.ID), &(user.FirstName), &(user.LastName)); err != nil {
 		return
 	}
-	user.ID = id
-	user.FirstName = firstName
-	user.LastName = lastName
 	return
 }
 
 func (repo *UserRepository) FindAll() (users model.Users, err error) {
-	rows, err := repo.Sqlhandler.Query("SELECT id, FirstName, LastName FROM users")
-	defer rows.Close()
+	rows, err := repo.Sqlhandler.Query("SELECT id, FirstName, LastName FROM users;")
 	if err != nil {
 		return
 	}
 	for rows.Next() {
-		var id int
-		var firstName string
-		var lastName string
-		if err := rows.Scan(&id, &firstName, &lastName); err != nil {
+		var user model.User
+		if err := rows.Scan(&(user.ID), &(user.FirstName), &(user.LastName)); err != nil {
 			continue
-		}
-		user := model.User{
-			ID:        id,
-			FirstName: firstName,
-			LastName:  lastName,
 		}
 		users = append(users, user)
 	}

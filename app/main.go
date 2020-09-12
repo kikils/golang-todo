@@ -1,7 +1,13 @@
 package main
 
-import "github.com/kikils/golang-todo/infrastructure"
+import (
+	"log"
+	"net/http"
+
+	"github.com/kikils/golang-todo/infrastructure"
+)
 
 func main() {
-	infrastructure.Router.Run()
+	mux := infrastructure.SetUpRouting()
+	log.Fatal(http.ListenAndServe(":8080", mux))
 }
