@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/kikils/golang-todo/app/interfaces/database"
+	"github.com/kikils/golang-todo/interfaces/database"
 	_ "github.com/lib/pq" // postres driver
 )
 

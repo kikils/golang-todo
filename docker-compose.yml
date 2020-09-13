@@ -6,7 +6,7 @@ services:
     container_name: golang_todo_app
     tty: true
     volumes:
-      - ./app:/go/src/github.com/kikils/golang-todo/app
+      - ./app:/go/src/github.com/kikils/golang-todo
     stdin_open: true
     ports:
         - 8080:8080

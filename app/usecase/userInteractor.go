@@ -1,6 +1,6 @@
 package usecase
 
-import "github.com/kikils/golang-todo/app/domain/model"
+import "github.com/kikils/golang-todo/domain/model"
 
 type UserInteractor struct {
 	UserRepository UserRepository
