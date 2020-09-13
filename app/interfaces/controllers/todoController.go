@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 
@@ -116,7 +117,11 @@ func ResponseOk(w http.ResponseWriter, body interface{}) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 
-	json.NewEncoder(w).Encode(body)
+	err := json.NewEncoder(w).Encode(body)
+	if err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
 }
 
 func ResponseError(w http.ResponseWriter, code int, message string) {
@@ -126,5 +131,9 @@ func ResponseError(w http.ResponseWriter, code int, message string) {
 	body := map[string]string{
 		"error": message,
 	}
-	json.NewEncoder(w).Encode(body)
+	err := json.NewEncoder(w).Encode(body)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 }

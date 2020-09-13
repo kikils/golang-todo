@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/kikils/golang-todo/interfaces/controllers"
@@ -22,7 +23,7 @@ func SetUpRouting() *http.ServeMux {
 		case http.MethodGet:
 			userController.Index(w, r)
 		default:
-			responseError(w, http.StatusNotFound, "")
+			ResponseError(w, http.StatusNotFound, "")
 		}
 	})
 
@@ -31,7 +32,7 @@ func SetUpRouting() *http.ServeMux {
 		case http.MethodGet:
 			userController.Show(w, r)
 		default:
-			responseError(w, http.StatusNotFound, "")
+			ResponseError(w, http.StatusNotFound, "")
 		}
 	})
 
@@ -42,7 +43,7 @@ func SetUpRouting() *http.ServeMux {
 		case http.MethodGet:
 			todoController.Index(w, r)
 		default:
-			responseError(w, http.StatusNotFound, "")
+			ResponseError(w, http.StatusNotFound, "")
 		}
 	})
 	mux.HandleFunc("/todo/get", func(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +51,7 @@ func SetUpRouting() *http.ServeMux {
 		case http.MethodGet:
 			todoController.Show(w, r)
 		default:
-			responseError(w, http.StatusNotFound, "")
+			ResponseError(w, http.StatusNotFound, "")
 		}
 	})
 	mux.HandleFunc("/todo/search", func(w http.ResponseWriter, r *http.Request) {
@@ -58,18 +59,22 @@ func SetUpRouting() *http.ServeMux {
 		case http.MethodPost:
 			todoController.Search(w, r)
 		default:
-			responseError(w, http.StatusNotFound, "")
+			ResponseError(w, http.StatusNotFound, "")
 		}
 	})
 	return mux
 }
 
-func responseError(w http.ResponseWriter, code int, message string) {
+func ResponseError(w http.ResponseWriter, code int, message string) {
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")
 
 	body := map[string]string{
 		"error": message,
 	}
-	json.NewEncoder(w).Encode(body)
+	err := json.NewEncoder(w).Encode(body)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 }

@@ -26,7 +26,10 @@ func Test_Sqlhandler(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	handler.Execute("CREATE TABLE foo (id integer, name varchar(42));")
+	_, err = handler.Execute("CREATE TABLE foo (id integer, name varchar(42));")
+	if err != nil {
+		t.Fatal(err)
+	}
 	insertQuery := "INSERT INTO foo (id, name) VALUES ($1, $2);"
 
 	for _, tt := range tests {
@@ -40,7 +43,10 @@ func Test_Sqlhandler(t *testing.T) {
 			t.Fatal(err)
 		}
 		row.Next()
-		row.Scan(&got.id, &got.name)
+		err = row.Scan(&got.id, &got.name)
+		if err != nil {
+			t.Fatal(err)
+		}
 		t.Run(tt.name, func(t *testing.T) {
 			if !isEqual(got, tt.want) {
 				t.Errorf("got: %v, want: %v", got, tt.want)
