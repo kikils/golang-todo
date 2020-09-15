@@ -1,4 +1,7 @@
 # TODOアプリ with クリーンアーキテクチャ
+# Detail
+クリーンアーキテクチャを意識してTODOアプリを作成した。
+
 ## How to start dev on your local machine
 ```
 # Build new docker images.
