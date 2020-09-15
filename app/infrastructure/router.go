@@ -12,6 +12,10 @@ func SetUpRouting() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	sqlhandler := NewSqlhandler()
+	err := CreateTable(sqlhandler)
+	if err != nil {
+		log.Println(err.Error())
+	}
 	userController := controllers.NewUserController(sqlhandler)
 	todoController := controllers.NewTodoController(sqlhandler)
 

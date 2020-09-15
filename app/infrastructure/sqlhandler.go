@@ -28,6 +28,18 @@ func NewSqlhandler() *Sqlhandler {
 	return &Sqlhandler{db}
 }
 
+func CreateTable(handler *Sqlhandler) (err error) {
+	_, err = handler.Execute("CREATE TABLE IF NOT EXISTS users (id SERIAL NOT NULL, FirstName varchar(30) NOT NULL, LastName varchar(30) NOT NULL);")
+	if err != nil {
+		return
+	}
+	_, err = handler.Execute("CREATE TABLE IF NOT EXISTS todos (id SERIAL NOT NULL, title varchar(30) NOT NULL, note varchar(30), duedate DATE, userid INTEGER);")
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (handler *Sqlhandler) Execute(statement string, args ...interface{}) (database.Result, error) {
 	res := SqlResult{}
 	result, err := handler.DB.Exec(statement, args...)
