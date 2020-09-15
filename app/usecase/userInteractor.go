@@ -11,6 +11,16 @@ func (interactor *UserInteractor) Add(u model.User) (id int, err error) {
 	return
 }
 
+func (interactor *UserInteractor) Update(u model.User) (id int, err error) {
+	id, err = interactor.UserRepository.Update(u)
+	return
+}
+
+func (interactor *UserInteractor) Delete(userID int) (err error) {
+	err = interactor.UserRepository.Delete(userID)
+	return
+}
+
 func (interactor *UserInteractor) Users() (user model.Users, err error) {
 	user, err = interactor.UserRepository.FindAll()
 	return

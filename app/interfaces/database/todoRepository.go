@@ -24,6 +24,31 @@ func (repo *TodoRepository) Store(t model.Todo) (id int, err error) {
 	return
 }
 
+func (repo *TodoRepository) Update(t model.Todo) (id int, err error) {
+	row, err := repo.Sqlhandler.Query(
+		"UPDATE todos SET title=$1, note=$2, duedate=$3, userid=$4 WHERE id=$5 RETURNING id;",
+		t.Title, t.Note, t.DueDate, t.UserID, t.ID,
+	)
+
+	if err != nil {
+		return
+	}
+	for row.Next() {
+		if err := row.Scan(&id); err != nil {
+			return -1, err
+		}
+	}
+	return
+}
+
+func (repo *TodoRepository) Delete(id int) (err error) {
+	_, err = repo.Sqlhandler.Query("DELETE FROM todos WHERE id=$1", id)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (repo *TodoRepository) FindById(id int) (todo model.Todo, err error) {
 	row, err := repo.Sqlhandler.Query("SELECT id, title, note, duedate FROM todos WHERE id = $1;", id)
 	if err != nil {
@@ -37,7 +62,7 @@ func (repo *TodoRepository) FindById(id int) (todo model.Todo, err error) {
 }
 
 func (repo *TodoRepository) FindByUserId(userID int) (todoList model.Todos, err error) {
-	query := `SELECT DISTINCT todos.id, title, note, duedate FROM todos INNER JOIN users ON todos.userid=users.id AND users.id=$1;`
+	query := `SELECT DISTINCT todos.id, title, note, duedate FROM todos INNER JOIN users ON todos.userid=users.id AND todos.userid=$1;`
 	rows, err := repo.Sqlhandler.Query(query, userID)
 	if err != nil {
 		return

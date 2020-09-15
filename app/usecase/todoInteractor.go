@@ -13,6 +13,16 @@ func (interactor *TodoInteractor) Add(t model.Todo) (id int, err error) {
 	return
 }
 
+func (interactor *TodoInteractor) Update(t model.Todo) (id int, err error) {
+	id, err = interactor.TodoRepository.Update(t)
+	return
+}
+
+func (interactor *TodoInteractor) Delete(id int) (err error) {
+	err = interactor.TodoRepository.Delete(id)
+	return
+}
+
 func (interactor *TodoInteractor) Todos() (todos model.Todos, err error) {
 	todos, err = interactor.TodoRepository.FindAll()
 	return

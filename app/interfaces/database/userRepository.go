@@ -24,8 +24,32 @@ func (repo *UserRepository) Store(u model.User) (id int, err error) {
 	return
 }
 
-func (repo *UserRepository) FindById(identifier int) (user model.User, err error) {
-	row, err := repo.Sqlhandler.Query("SELECT id, FirstName, LastName FROM users WHERE id = $1;", identifier)
+func (repo *UserRepository) Update(user model.User) (id int, err error) {
+	row, err := repo.Sqlhandler.Query(
+		"UPDATE users SET FirstName=$1, LastName=$2 WHERE id=$3 RETURNING id;", user.FirstName, user.LastName, user.ID,
+	)
+
+	if err != nil {
+		return
+	}
+	for row.Next() {
+		if err := row.Scan(&id); err != nil {
+			return -1, err
+		}
+	}
+	return
+}
+
+func (repo *UserRepository) Delete(userID int) (err error) {
+	_, err = repo.Sqlhandler.Query("DELETE FROM users WHERE id=$1", userID)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (repo *UserRepository) FindById(userID int) (user model.User, err error) {
+	row, err := repo.Sqlhandler.Query("SELECT id, FirstName, LastName FROM users WHERE id = $1;", userID)
 	if err != nil {
 		return
 	}

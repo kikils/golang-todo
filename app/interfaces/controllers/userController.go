@@ -76,3 +76,47 @@ func (controller *UserController) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	ResponseOk(w, user)
 }
+
+func (controller *UserController) Update(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var user model.User
+	if err := json.Unmarshal(b, &user); err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	id, err := controller.Interactor.Update(user)
+	if err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	ResponseOk(w, id)
+}
+
+func (controller *UserController) Delete(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var req struct {
+		ID int `json:"id"`
+	}
+	if err := json.Unmarshal(b, &req); err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = controller.Interactor.Delete(req.ID)
+	if err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	ResponseOk(w, "Success!")
+}
