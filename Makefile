@@ -1,3 +1,5 @@
+build:
+	docker-compose build
 upd:
 	docker-compose up -d
 
