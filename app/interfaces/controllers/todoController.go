@@ -43,7 +43,7 @@ func (controller *TodoController) Create(w http.ResponseWriter, r *http.Request)
 		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	formattedTime, _ := time.Parse("20060102", todoReceptor.DueDate)
+	formattedTime := parseTime(todoReceptor.DueDate)
 	todo := model.Todo{
 		Title:   todoReceptor.Title,
 		Note:    todoReceptor.Note,
@@ -51,6 +51,40 @@ func (controller *TodoController) Create(w http.ResponseWriter, r *http.Request)
 		UserID:  todoReceptor.UserID,
 	}
 	id, err := controller.Interactor.Add(todo)
+	if err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	ResponseOk(w, id)
+}
+
+func (controller *TodoController) Update(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var todoReceptor struct {
+		ID      int    `json:"id"`
+		Title   string `json:"title"`
+		Note    string `json:"note"`
+		DueDate string `json:"due_date"`
+		UserID  int    `json:"user_id"`
+	}
+	if err := json.Unmarshal(b, &todoReceptor); err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	formattedTime := parseTime(todoReceptor.DueDate)
+	todo := model.Todo{
+		ID:      todoReceptor.ID,
+		Title:   todoReceptor.Title,
+		Note:    todoReceptor.Note,
+		DueDate: formattedTime,
+		UserID:  todoReceptor.UserID,
+	}
+	id, err := controller.Interactor.Update(todo)
 	if err != nil {
 		ResponseError(w, http.StatusBadRequest, err.Error())
 		return
@@ -88,6 +122,29 @@ func (controller *TodoController) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ResponseOk(w, todo)
+}
+
+func (controller *TodoController) Delete(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		ResponseError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var req struct {
+		ID int `json:"id"`
+	}
+	if err := json.Unmarshal(b, &req); err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = controller.Interactor.Delete(req.ID)
+	if err != nil {
+		ResponseError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	ResponseOk(w, "Success!")
 }
 
 func (controller *TodoController) Search(w http.ResponseWriter, r *http.Request) {
@@ -136,4 +193,9 @@ func ResponseError(w http.ResponseWriter, code int, message string) {
 		log.Println(err.Error())
 		return
 	}
+}
+
+func parseTime(date string) (formattedTime time.Time) {
+	formattedTime, _ = time.Parse("20060102", date)
+	return
 }
